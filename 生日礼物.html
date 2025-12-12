@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>生日快乐 - 马佳欣</title>
+  <style>
+    /* 全局样式 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "微软雅黑", "Microsoft YaHei", sans-serif;
+    }
+
+    body {
+      overflow: hidden;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* 登录页面样式 */
+    .login-page {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+      z-index: 10;
+    }
+
+    .login-container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      backdrop-filter: blur(10px);
+      animation: slideIn 0.8s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .login-container h2 {
+      color: #764ba2;
+      margin-bottom: 30px;
+      font-size: 2rem;
+      font-weight: bold;
+    }
+
+    .login-container input {
+      width: 100%;
+      padding: 15px;
+      margin: 15px 0;
+      border: 2px solid #e1e1e1;
+      border-radius: 10px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+    }
+
+    .login-container input:focus {
+      border-color: #764ba2;
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(118, 75, 162, 0.1);
+    }
+
+    .login-container button {
+      width: 100%;
+      padding: 15px;
+      margin-top: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .login-container button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(118, 75, 162, 0.4);
+    }
+
+    /* 主页面样式 */
+    .main-content {
+      display: none;
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* 烟花画布 */
+    #fireworks-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* 页面容器 */
+    .page {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      z-index: 2;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .page.active {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* 生日祝福页面 */
+    .birthday-page {
+      text-align: center;
+      color: white;
+      padding: 20px;
+    }
+
+    .birthday-page h1 {
+      font-size: 3.5rem;
+      margin-bottom: 20px;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+      animation: fadeInUp 1.5s ease-out;
+    }
+
+    .birthday-page h2 {
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
+      animation: fadeInUp 1.5s ease-out 0.5s both;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .cake-container {
+      margin: 40px 0;
+      animation: fadeInUp 1.5s ease-out 1s both;
+    }
+
+    .cake-container img {
+      width: 350px;
+      height: 300px;
+      object-fit: cover;
+      border-radius: 20px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    /* 祝福页面 */
+    .wishes-page {
+      padding: 40px 20px;
+      max-width: 800px;
+      margin: 0 auto;
+      color: white;
+    }
+
+    .wishes-page h1 {
+      font-size: 2.5rem;
+      margin-bottom: 40px;
+      text-align: center;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+    }
+
+    .wish-item {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 25px;
+      margin: 20px 0;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+      opacity: 0;
+      animation: fadeInLeft 1s ease-out forwards;
+      font-size: 1.1rem;
+      line-height: 1.6;
+    }
+
+    @keyframes fadeInLeft {
+      from {
+        opacity: 0;
+        transform: translateX(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
+
+    /* 相册页面 */
+    .album-page {
+      padding: 40px 20px;
+      max-width: 1200px;
+      margin: 0 auto;
+      color: white;
+    }
+
+    .album-page h1 {
+      font-size: 2.5rem;
+      margin-bottom: 40px;
+      text-align: center;
+      text-shadow: 0 0 15px rgba(255, 255, 255, 0.8);
+    }
+
+    .album-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .album-card {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      overflow: hidden;
+      backdrop-filter: blur(10px);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .album-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-header {
+      padding: 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-align: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .card-content {
+      padding: 20px;
+      display: none;
+    }
+
+    .card-content.show {
+      display: block;
+      animation: fadeIn 0.5s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .card-content p {
+      margin-bottom: 15px;
+      line-height: 1.6;
+    }
+
+    .card-content img {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+
+    /* 导航按钮 */
+    .nav-buttons {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 15px;
+      z-index: 100;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 15px;
+      border-radius: 30px;
+      backdrop-filter: blur(10px);
+    }
+
+    .nav-btn {
+      padding: 12px 25px;
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .nav-btn:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .nav-btn.active {
+      background: rgba(255, 255, 255, 0.4);
+      box-shadow: 0 5px 15px rgba(255, 255, 255, 0.3);
+    }
+
+    /* 视频容器 */
+    .video-container {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    .video-container video {
+      max-width: 80%;
+      height: auto;
+      border-radius: 15px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      .birthday-page h1 {
+        font-size: 2.5rem;
+      }
+
+      .birthday-page h2 {
+        font-size: 1.8rem;
+      }
+
+      .cake-container img {
+        width: 280px;
+        height: 240px;
+      }
+
+      .nav-buttons {
+        flex-wrap: wrap;
+        bottom: 20px;
+        padding: 10px;
+      }
+
+      .nav-btn {
+        font-size: 12px;
+        padding: 10px 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- 登录页面 -->
+  <div class="login-page" id="loginPage">
+    <div class="login-container">
+      <h2>🎂 生日快乐 🎂</h2>
+      <input type="text" id="nameInput" placeholder="请输入您的名字" value="">
+      <input type="password" id="passwordInput" placeholder="请输入密码" value="">
+      <button onclick="enterBirthday()">进入生日派对</button>
+    </div>
+  </div>
+
+  <!-- 主内容区域 -->
+  <div class="main-content" id="mainContent">
+    <!-- 烟花画布 -->
+    <canvas id="fireworks-canvas"></canvas>
+
+    <!-- 生日祝福页面 -->
+    <div class="page active birthday-page" id="birthdayPage">
+      <h1 id="greeting">Hi 马佳欣！</h1>
+      <h2>祝你生日快乐！</h2>
+      <div class="cake-container">
+        <img src="照片/3.jpg" alt="生日蛋糕">
+      </div>
+    </div>
+
+    <!-- 祝福语页面 -->
+    <div class="page wishes-page" id="wishesPage">
+      <h1>生日祝福 🌟</h1>
+      <div class="wish-item" style="animation-delay: 0.2s;">
+        20岁生日快乐呀！新的一岁，愿你每天都有小开心，万事顺意，也别忘了要多爱自己一点～
+      </div>
+      </div>
+      <div class="wish-item" style="animation-delay: 0.6s;">
+        恭喜你正式迈入20岁的新阶段啦！愿这个年纪的你，既能奔赴热爱，也能被世界温柔以待，生日快乐！
+      </div>
+      <div class="wish-item" style="animation-delay: 0.8s;">
+        20岁生日快乐！愿你在新的一岁里，眼里有光，脚下有路，每一天都过得闪闪发光✨
+      </div>
+      <div class="wish-item" style="animation-delay: 1s;">
+        祝我的宝藏朋友20岁生日快乐！20岁是超棒的年纪，愿你永远热烈、永远明朗，想要的都能慢慢实现～
+      </div>
+    </div>
+
+    <!-- 时光相册页面 -->
+    <div class="page album-page" id="albumPage">
+      <h1>时光相册 💝</h1>
+      <div class="album-grid">
+        <div class="album-card" onclick="toggleCard(this)">
+          <div class="card-header">贪吃不胖，深情不负</div>
+          <div class="card-content">
+            <p>乖乖永远开心，一直幸运。平平安安，一生被爱，想要的都拥有，得不到的都释怀。</p>
+            <img src="照片/f1834d5f6e431a160034e79977b5c9cc.jpg" alt="生日礼物">
+          </div>
+        </div>
+        <div class="album-card" onclick="toggleCard(this)">
+          <div class="card-header">许个愿吧 🌟</div>
+          <div class="card-content">
+            <p>今晚的星星只有二十颗，数到第二十颗就把眼睛闭上，在赛里木湖许下你的愿望吧</p>
+            <img src="照片/VCG211438841231.jpg" alt="星空许愿">
+          </div>
+        </div>
+        <div class="album-card" onclick="toggleCard(this)">
+          <div class="card-header">永远年轻 ✨</div>
+          <div class="card-content">
+            <p>愿你永远保持童心，永远热爱生活，永远被这个世界温柔以待。</p>
+            <img src="照片/2.jpeg" alt="青春无悔">
+          </div>
+        </div>
+      </div>
+        </video>
+      </div>
+    </div>
+
+    <!-- 导航按钮 -->
+    <div class="nav-buttons">
+      <button class="nav-btn active" onclick="showPage('birthdayPage', this)">生日祝福</button>
+      <button class="nav-btn" onclick="showPage('wishesPage', this)">祝福语</button>
+      <button class="nav-btn" onclick="showPage('albumPage', this)">时光相册</button>
+      <button class="nav-btn" onclick="toggleFireworks()">烟花效果</button>
+    </div>
+  </div>
+
+  <script>
+    // 全局变量
+    let userName = '马佳欣';
+    let fireworksAnimation = null;
+    let fireworksEnabled = false;
+
+    // 烟花类
+    class Firework {
+      constructor(canvas, ctx) {
+        this.canvas = canvas;
+        this.ctx = ctx;
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height;
+        this.targetY = Math.random() * canvas.height * 0.5;
+        this.speed = 2 + Math.random() * 3;
+        this.exploded = false;
+        this.particles = [];
+        this.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+      }
+
+      update() {
+        if (!this.exploded) {
+          this.y -= this.speed;
+          if (this.y <= this.targetY) {
+            this.explode();
+          }
+        } else {
+          this.particles = this.particles.filter(particle => {
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+            particle.vy += 0.1; // 重力
+            particle.life -= 0.015;
+            return particle.life > 0;
+          });
+        }
+      }
+
+      explode() {
+        this.exploded = true;
+        const particleCount = 50 + Math.floor(Math.random() * 50);
+
+        for (let i = 0; i < particleCount; i++) {
+          const angle = (Math.PI * 2 * i) / particleCount;
+          const velocity = 2 + Math.random() * 4;
+
+          this.particles.push({
+            x: this.x,
+            y: this.y,
+            vx: Math.cos(angle) * velocity,
+            vy: Math.sin(angle) * velocity,
+            life: 1,
+            color: this.color
+          });
+        }
+      }
+
+      draw() {
+        if (!this.exploded) {
+          this.ctx.beginPath();
+          this.ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+          this.ctx.fillStyle = this.color;
+          this.ctx.fill();
+
+          // 拖尾效果
+          this.ctx.beginPath();
+          this.ctx.moveTo(this.x, this.y);
+          this.ctx.lineTo(this.x, this.y + 10);
+          this.ctx.strokeStyle = this.color;
+          this.ctx.lineWidth = 2;
+          this.ctx.stroke();
+        } else {
+          this.particles.forEach(particle => {
+            this.ctx.beginPath();
+            this.ctx.arc(particle.x, particle.y, 2, 0, Math.PI * 2);
+            this.ctx.fillStyle = particle.color;
+            this.ctx.globalAlpha = particle.life;
+            this.ctx.fill();
+          });
+          this.ctx.globalAlpha = 1;
+        }
+      }
+
+      isDead() {
+        return this.exploded && this.particles.length === 0;
+      }
+    }
+
+    // 烟花管理器
+    class FireworksManager {
+      constructor() {
+        this.canvas = document.getElementById('fireworks-canvas');
+        this.ctx = this.canvas.getContext('2d');
+        this.fireworks = [];
+        this.isRunning = false;
+        this.init();
+      }
+
+      init() {
+        this.resizeCanvas();
+        window.addEventListener('resize', () => this.resizeCanvas());
+      }
+
+      resizeCanvas() {
+        this.canvas.width = window.innerWidth;
+        this.canvas.height = window.innerHeight;
+      }
+
+      start() {
+        if (this.isRunning) return;
+        this.isRunning = true;
+        this.animate();
+      }
+
+      stop() {
+        this.isRunning = false;
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.fireworks = [];
+      }
+
+      animate() {
+        if (!this.isRunning) return;
+
+        this.ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+        // 添加新烟花
+        if (Math.random() < 0.03) {
+          this.fireworks.push(new Firework(this.canvas, this.ctx));
+        }
+
+        // 更新和绘制烟花
+        this.fireworks = this.fireworks.filter(firework => {
+          firework.update();
+          firework.draw();
+          return !firework.isDead();
+        });
+
+        requestAnimationFrame(() => this.animate());
+      }
+    }
+
+    // 初始化烟花管理器
+    const fireworksManager = new FireworksManager();
+
+    // 进入生日页面
+    function enterBirthday() {
+      const nameInput = document.getElementById('nameInput');
+      const passwordInput = document.getElementById('passwordInput');
+
+      userName = nameInput.value.trim() || '马佳欣';
+      const password = passwordInput.value.trim();
+
+      if (userName && password) {
+        // 更新页面中的用户名
+        document.getElementById('greeting').textContent = `Hi ${userName}！`;
+
+        // 切换页面显示
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+
+        // 启动烟花效果
+        setTimeout(() => {
+          fireworksManager.start();
+          fireworksEnabled = true;
+        }, 1000);
+      } else {
+        alert('请输入名字和密码！');
+      }
+    }
+
+    // 切换页面显示
+    function showPage(pageId, buttonElement) {
+      // 隐藏所有页面
+      document.querySelectorAll('.page').forEach(page => {
+        page.classList.remove('active');
+      });
+
+      // 显示目标页面
+      document.getElementById(pageId).classList.add('active');
+
+      // 更新导航按钮状态
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      buttonElement.classList.add('active');
+
+      // 触发动画效果
+      const activePage = document.getElementById(pageId);
+      const wishItems = activePage.querySelectorAll('.wish-item');
+      wishItems.forEach((item, index) => {
+        item.style.animation = 'none';
+        setTimeout(() => {
+          item.style.animation = `fadeInLeft 1s ease-out ${index * 0.2}s forwards`;
+        }, 100);
+      });
+    }
+
+    // 切换烟花效果
+    function toggleFireworks() {
+      fireworksEnabled = !fireworksEnabled;
+      if (fireworksEnabled) {
+        fireworksManager.start();
+      } else {
+        fireworksManager.stop();
+      }
+    }
+
+    // 切换相册卡片
+    function toggleCard(card) {
+      const content = card.querySelector('.card-content');
+      content.classList.toggle('show');
+    }
+
+    // 页面加载完成后的初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      // 添加键盘事件支持
+      document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          enterBirthday();
+        }
+      });
+
+      document.getElementById('nameInput').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          document.getElementById('passwordInput').focus();
+        }
+      });
+
+      // 防止视频自动播放问题
+      const video = document.querySelector('video');
+      if (video) {
+        video.muted = true; // 确保静音以允许自动播放
+        video.play().catch(e => {
+          console.log('视频自动播放被阻止，用户需要手动播放');
+        });
+      }
+    });
+
+    // 窗口大小改变时重新调整画布
+    window.addEventListener('resize', function() {
+      if (fireworksManager) {
+        fireworksManager.resizeCanvas();
+      }
+    });
+  </script>
+</body>
+</html>
